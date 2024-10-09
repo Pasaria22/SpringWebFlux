@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +24,35 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		ejemploIterable();
-		segundoEjemploIterable();
+		ejemploFlatMap();
+
+	}
+
+	public void ejemploFlatMap() throws Exception {
+		List<String> usuariosList = new ArrayList<>();
+		usuariosList.add("Pepito Grillo");
+		usuariosList.add("Fulanito Pérez");
+		usuariosList.add("Menganito López");
+		usuariosList.add("Juanito Pérez");
+		usuariosList.add("Omar Montes");
+		usuariosList.add("Bruce Lee");
+		usuariosList.add("Bruce Willis");
+
+		Flux.fromIterable(usuariosList)
+				.map(nombre -> new Usuario(nombre.split(" ")[0].toUpperCase(), nombre.split(" ")[1].toUpperCase()))
+				.flatMap(usuario -> {
+					if (usuario.getNombre().equalsIgnoreCase("bruce")) {
+						return Mono.just(usuario);
+					} else {
+						return Mono.empty();
+					}
+				})
+				.map(usuario -> {
+					String nombre = usuario.getNombre().toLowerCase();
+					usuario.setNombre(nombre);
+					return usuario;
+				})
+				.subscribe(u -> log.info(u.toString()));
 
 	}
 
