@@ -1,4 +1,4 @@
-package com.soritechnology.reactor.app.model;
+package com.soritechnology.reactor.app.models;
 
 public class Usuario {
 

@@ -1,6 +1,8 @@
 package com.soritechnology.reactor.app;
 
-import com.soritechnology.reactor.app.model.Usuario;
+import com.soritechnology.reactor.app.models.Comentarios;
+import com.soritechnology.reactor.app.models.Usuario;
+import com.soritechnology.reactor.app.models.UsuarioComentarios;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -24,8 +26,24 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		ejemploCollectList();
+		ejemploUsuarioComentariosFlatMap();
 
+	}
+
+	public void ejemploUsuarioComentariosFlatMap() {
+		Mono<Usuario> usuarioMono = Mono.fromCallable(() -> new Usuario("John", "Doe"));
+
+		Mono<Comentarios> comentariosUsuarioMono = Mono.fromCallable(() -> {
+			Comentarios comentarios = new Comentarios();
+			comentarios.addComentario("Hola pepe, que tal estamos?");
+			comentarios.addComentario("Mañana tengo una reunión muy importante");
+			comentarios.addComentario("Estoy muy emocionado con el curso de Reactor");
+			return comentarios;
+		});
+
+
+		usuarioMono.flatMap(u -> comentariosUsuarioMono.map(c -> new UsuarioComentarios(u, c)))
+				.subscribe(uc -> log.info(uc.toString()));
 	}
 
 	public void ejemploCollectList() throws Exception {
