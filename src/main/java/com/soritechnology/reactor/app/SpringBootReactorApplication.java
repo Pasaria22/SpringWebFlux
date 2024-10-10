@@ -3,6 +3,8 @@ package com.soritechnology.reactor.app;
 import com.soritechnology.reactor.app.models.Comentarios;
 import com.soritechnology.reactor.app.models.Usuario;
 import com.soritechnology.reactor.app.models.UsuarioComentarios;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -30,7 +32,50 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		ejemploIntervalDesdeCreate();
+		ejemploContraPresion();
+
+	}
+
+	public void ejemploContraPresion() {
+
+		Flux.range(1, 10)
+				.log()
+				.limitRate(5)
+				.subscribe(/*new Subscriber<Integer> () {
+
+					private Subscription subscription;
+
+					private Integer limite = 5;
+					private Integer consumido = 0;
+
+					@Override
+					public void onSubscribe(Subscription subscription) {
+						this.subscription = subscription;
+						this.subscription.request(limite);
+					}
+
+					@Override
+					public void onNext(Integer t) {
+						log.info(t.toString());
+						consumido++;
+						if (consumido ==  limite) {
+							consumido = 0;
+							subscription.request(limite);
+						}
+
+					}
+
+
+					@Override
+					public void onError(Throwable throwable) {
+
+					}
+
+					@Override
+					public void onComplete() {
+
+					}
+				}*/);
 
 	}
 
