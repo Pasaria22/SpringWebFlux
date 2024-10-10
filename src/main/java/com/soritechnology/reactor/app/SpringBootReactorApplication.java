@@ -14,6 +14,8 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.CountDownLatch;
 
 
@@ -28,7 +30,37 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		ejemploIntervalInfinito();
+		ejemploIntervalDesdeCreate();
+
+	}
+
+	public void ejemploIntervalDesdeCreate() {
+		Flux.create(emitter -> {
+			Timer timer = new Timer();
+			timer.schedule(new TimerTask() {
+
+				private Integer contador = 0;
+
+				@Override
+				public void run() {
+					emitter.next(++contador);
+					if (contador == 10) {
+						timer.cancel();
+						emitter.complete();
+					}
+
+					if (contador == 5) {
+						timer.cancel();
+						emitter.error(new InterruptedException("Error, se ha detenido el flux en 5!"));
+					}
+				}
+			}, 1000, 1000);
+		})
+				//.doOnNext(next -> log.info(next.toString()))
+				//.doOnComplete(() -> log.info("Hemos acabado la ejecución"))
+				.subscribe(next -> log.info(next.toString()),
+						error -> log.error(error.getMessage()),
+						() -> log.info("Hemos acabado la ejecución"));
 
 	}
 
