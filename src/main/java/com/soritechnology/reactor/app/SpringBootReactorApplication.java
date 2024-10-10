@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +27,29 @@ public class SpringBootReactorApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		ejemploZipWithRangos();
+		ejemploDelayElements();
 
+	}
+
+	public void ejemploInterval() {
+		Flux<Integer> rango = Flux.range(1, 12);
+		Flux<Long> retraso = Flux.interval(Duration.ofSeconds(1));
+
+		rango.zipWith(retraso, (ra, re) -> ra)
+				.doOnNext(i -> log.info(i.toString()))
+				.blockLast(); 	// Esto lo usamos para poder verlo desde la terminal. Ya que de lo contrario no se vería nada. Finalizaría el main pero por detras la maquina
+								// virtual seguiría usando los hilos y no se vería nada.
+				//.subscribe();
+	}
+
+	public void ejemploDelayElements() throws InterruptedException {
+		Flux<Integer> rango = Flux.range(1, 12);
+		rango.delayElements(Duration.ofSeconds(1))
+				.doOnNext(i -> log.info(i.toString()))
+				.subscribe();
+				//.blockLast();
+
+		Thread.sleep(13000);
 	}
 
 	public void ejemploZipWithRangos() {
